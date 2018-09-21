@@ -49,8 +49,8 @@ def medium_range_terrain(file):
 	return df
 
 #usage
-df = medium_range_terrain("/nwmftp/prod/nwm.20180920/medium_range/nwm.t18z.medium_range.terrain_rt.f240.conus.nc")
+#df = medium_range_terrain("/nwmftp/prod/nwm.20180920/medium_range/nwm.t18z.medium_range.terrain_rt.f240.conus.nc")
 
 #connect to MapD, upload data
-conn=connect(user="mapd", password="i-0c8cb37b31ea60c5a", host="localhost", dbname="mapd")
-conn.load_table("nwm_terrain_mediumrangetest",df,create='infer',method='arrow') 
+#conn=connect(user="mapd", password="i-0c8cb37b31ea60c5a", host="localhost", dbname="mapd")
+#conn.load_table("nwm_terrain_mediumrangetest",df,create='infer',method='arrow') 
