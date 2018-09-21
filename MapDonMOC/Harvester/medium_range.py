@@ -20,10 +20,9 @@ folder='nwm'+'.'+ yesterday_str
 # Find URl for downlaod
 url = 'ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/nwm/prod/'+ folder +'/medium_range/'
 
-# In[13]:
 
 response = urllib.request.urlopen(url)
-path_base = "/data/nwm_data"+ "/medium_range/"+ yesterday_str
+path_base = "/home/mapdadmin/data/nwm_data"+ "/medium_range/"+ yesterday_str
 metadata_dict={}
 metadata_filename= "metadata_"+  "medium_range_"+ yesterday_str+ ".csv"
 #os.mkdir(path, 0777)
@@ -38,7 +37,7 @@ for lines in response.readlines():
     #print(value)
            if not os.path.exists(path):
               #print("Making directory", path)
-              os.makedirs(path)  
+              os.makedirs(path)
            #print(line_str[56:]
            file_time=line_str[50:55]
            index = (line_str.index(".nc"))+3
@@ -50,13 +49,13 @@ for lines in response.readlines():
                    file_str = 'f0'+ str(x)
                else:
                    file_str='f'+str(x)
-               #print(sub_str)     
-               if(('land' in filename) or ((file_str not in filename))):
+               #print(sub_str)
+               if(('land' in filename) or ('reservoir' in filename) or ((file_str not in filename))):
                             #print("Not loading file: ",filename)
                             continue
                            #print("Not loading file: ", filename)
 
-               else: 
+               else:
                    file_url = url + filename
                    local_filename= os.path.join(path, filename)
                    #print(filename)
@@ -65,7 +64,7 @@ for lines in response.readlines():
                          try:
                               urllib.request.urlretrieve(file_url,local_filename)
                               #print(filename)
-                              metadata_dict[filename]=file_time  
+                              metadata_dict[filename]=file_time
                               #print(filename)
                          except urllib.error.URLError as e:
                               print("Error loading file: ", filename)
@@ -79,4 +78,3 @@ with open(os.path.join(path_base, metadata_filename),'a+',encoding='utf-8') as m
     for key in metadata_dict:
         wrtr.writerow([key, metadata_dict[key]])
         myfile.flush() # whenever you want
-
