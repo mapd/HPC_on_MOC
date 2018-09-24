@@ -1,13 +1,10 @@
 import xarray as xr
-import gc
-from pymapd import connect
-import pyarrow as pa
-import numpy as np
 import pandas as pd
 from pyproj import Proj, transform
 import mzgeohash
 import unicodedata
 from datetime import datetime
+import glob
 
 #define how to process a single analysis_assim_terrain file
 def analysis_assim_terrain(file):
@@ -46,9 +43,25 @@ def analysis_assim_terrain(file):
 
 	return df
 
-#usage
-#df = analysis_assim_terrain('/nwmftp/prod/nwm.20180920/analysis_assim/nwm.t00z.analysis_assim.terrain_rt.tm00.conus.nc')
+#Could switch to if __main__():
+if True:
 
-#connect to MapD instance, load data
-#conn=connect(user="mapd", password="HyperInteractive", host="localhost", dbname="mapd")
-#conn.load_table("nwm_terrain_test",df,create='infer',method='arrow')
+    #Load previously processed files list
+    with open('/nwmftp/processed/processedfiles.txt') as f:
+        processedfiles = f.read().splitlines()
+
+    #Get all analysis_assim files for tm00, channel and 0|6|12|18
+    files = [x for x in glob.glob("/nwmftp/prod/**/analysis_assim/*terrain*tm00.conus.nc", recursive=True) if any(w in x for w in ('t00', 't06', 't12', 't18'))]
+
+    #Get files not already processed
+    needprocessing = [x for x in files if x not in processedfiles]
+
+    #Process files
+    for fn in needprocessing:
+        try:
+            tmpdf = analysis_assim_terrain(fn)
+            tmpdf.to_csv("/nwmftp/processed/files/{0}.csv.gz".format(fn.split('/')[-1]), index=False, compression='gzip')
+            with open('/nwmftp/processed/processedfiles.txt', 'a') as f:
+                f.write(fn + "\n")
+        except:
+            print("error!") #TODO: should make a warning somewhere
