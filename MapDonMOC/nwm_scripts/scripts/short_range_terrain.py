@@ -48,9 +48,28 @@ def short_range_terrain(file):
 
 	return df
 
-#usage
-#df = short_range_terrain("/nwmftp/prod/nwm.20180920/short_range/nwm.t00z.short_range.terrain_rt.f006.conus.nc")
+#Could switch to if __main__():
+if True:
 
-#connect to MapD, load data
-#conn=connect(user="mapd", password="HyperInteractive", host="localhost", dbname="mapd")
-#conn.load_table("nwm_data_short_term_terrain_test",df,create='infer',method='arrow')
+    #Load previously processed files list
+    with open('/nwmftp/processed/processedfiles.txt') as f:
+        processedfiles = f.read().splitlines()
+
+    #Get all analysis_assim files for tm00, channel and 0|6|12|18
+    files = [x for x in glob.glob("/nwmftp/prod/**/short_range/*terrain*.conus.nc", recursive=True)
+	if any(w in x for w in ('t00', 't06', 't12', 't18'))
+	and any(w in x for w in ('f006', 'f012', 'f018'))
+	]
+
+    #Get files not already processed
+    needprocessing = [x for x in files if x not in processedfiles]
+
+    #Process files
+    for fn in needprocessing:
+        try:
+            tmpdf = short_range_terrain(fn)
+            tmpdf.to_csv("/nwmftp/processed/files/{0}.csv.gz".format(fn.split('/')[-1]), index=False, compression='gzip')
+            with open('/nwmftp/processed/processedfiles.txt', 'a') as f:
+                f.write(fn + "\n")
+        except:
+            print("error!") #TODO: should make a warning somewhere
