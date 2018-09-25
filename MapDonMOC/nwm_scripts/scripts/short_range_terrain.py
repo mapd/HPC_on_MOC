@@ -1,13 +1,10 @@
 import xarray as xr
-import gc
-from pymapd import connect
-import pyarrow as pa
-import numpy as np
 import pandas as pd
 from pyproj import Proj, transform
 import mzgeohash
 import unicodedata
 from datetime import datetime
+import glob
 
 #define how to process a single short_range_terrain file
 def short_range_terrain(file):
